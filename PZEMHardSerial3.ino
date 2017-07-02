@@ -103,7 +103,7 @@ if (client.connected()) {
 
   
   Serial.println();
-  delay(9500);
+  delay(9500);       // задержка отправки сообщений по mqtt
 }
 
 void pzemstart() {
