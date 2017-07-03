@@ -43,7 +43,6 @@ PubSubClient client(ethClient);       //PubSubClient client(server, 1883, callba
 
 /*
 ************ MQTT INFORMATION (CHANGE THESE FOR YOUR SETUP) ******************
-
 #define mqtt_server "192.168.1.101" // Enter your MQTT server adderss or IP. I use my DuckDNS adddress (yourname.duckdns.org) in this field
 #define mqtt_user "iobroker" //enter your MQTT username
 #define mqtt_password "1234" //enter your password
@@ -51,9 +50,9 @@ PubSubClient client(ethClient);       //PubSubClient client(server, 1883, callba
 */
 
 float v1,v2,v3;
-float i1,i2,i3;
-float p1,p2,p3;
-float e1,e2,e3,eSum;
+float i1,i2,i3,iSum;
+float p1,p2,p3,pSum;
+float e1,e2,e3,eSum,ekSum;  //пофазно+ват,киловат
 unsigned long ttime;
 
 
@@ -61,8 +60,8 @@ void reconnect() {
     if (client.connect("PZEM004t_3","iobroker","1234")) {
       client.publish("mypower/connection", "true");
       
-	 
-	  //PubTopic();
+   
+    //PubTopic();
       client.subscribe("mypower/#");      
     }
 }
@@ -103,7 +102,7 @@ if (client.connected()) {
 
   
   Serial.println();
-  delay(20000);       // задержка отправки сообщений по mqtt
+  delay(19830);       // задержка отправки сообщений по mqtt
 }
 
 void pzemstart() {
@@ -123,17 +122,20 @@ void pzemstart() {
  i3 = pzem3.current(ip3);  
  p3 = pzem3.power(ip3);
  e3 = pzem3.energy(ip3);
-//energy
+//summ
  eSum = e1+e2+e3;
-	 
+ ekSum = (e1+e2+e3)/1000;
+ iSum = i1+i2+i3;
+ pSum = p1+p2+p3;
+    
  ttime = millis();
  //delay(100);
  
 client.publish("mypower/connection", "true");
-client.publish("mypower/phase1/voltage1", String(v1).c_str());	
+client.publish("mypower/phase1/voltage1", String(v1).c_str());  
 delay(10); 
 client.publish("mypower/phase2/voltage2", String(v2).c_str());
-delay(10); 	
+delay(10);  
 client.publish("mypower/phase3/voltage3", String(v3).c_str());
 delay(10); 
 client.publish("mypower/phase1/current1", String(i1).c_str());
@@ -155,12 +157,16 @@ delay(10);
 client.publish("mypower/phase3/energy3", String(e3).c_str());
 delay(10);
 client.publish("mypower/energySum", String(eSum).c_str());
-delay(10);	
+delay(10);
+client.publish("mypower/energySumK", String(ekSum).c_str());
+delay(10);
+client.publish("mypower/currentSum", String(iSum).c_str());
+delay(10); 
+client.publish("mypower/powerSum", String(pSum).c_str());
+delay(10);     
 client.publish("mypower/z_millis", String(ttime/1000).c_str());
 delay(10); 
 }
-
-
 
 
 
