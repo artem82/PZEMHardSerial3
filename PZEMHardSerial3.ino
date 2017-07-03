@@ -1,7 +1,7 @@
 /*
 Скетч для считывания pzem004t показаний с трех фаз. 
 для трех фаз на основе Arduino 2560 (4 uart)
-ver. 1.0
+ver. 1.1
 */
 
 // Arduino Mega пример использования всех 4 последовательных портов
@@ -53,7 +53,7 @@ PubSubClient client(ethClient);       //PubSubClient client(server, 1883, callba
 float v1,v2,v3;
 float i1,i2,i3;
 float p1,p2,p3;
-float e1,e2,e3;
+float e1,e2,e3,eSum;
 unsigned long ttime;
 
 
@@ -63,7 +63,7 @@ void reconnect() {
       
 	 
 	  //PubTopic();
-      client.subscribe("myhome1/#");      
+      client.subscribe("mypower/#");      
     }
 }
 
@@ -103,7 +103,7 @@ if (client.connected()) {
 
   
   Serial.println();
-  delay(9500);       // задержка отправки сообщений по mqtt
+  delay(20000);       // задержка отправки сообщений по mqtt
 }
 
 void pzemstart() {
@@ -118,14 +118,16 @@ void pzemstart() {
  i2 = pzem2.current(ip2);  
  p2 = pzem2.power(ip2);
  e2 = pzem2.energy(ip2);
-//3
+ //3
  v3 = pzem3.voltage(ip3);
  i3 = pzem3.current(ip3);  
  p3 = pzem3.power(ip3);
  e3 = pzem3.energy(ip3);
- 
+//energy
+ eSum = e1+e2+e3;
+	 
  ttime = millis();
- delay(100);
+ //delay(100);
  
 client.publish("mypower/connection", "true");
 client.publish("mypower/phase1/voltage1", String(v1).c_str());	
@@ -151,7 +153,9 @@ delay(10);
 client.publish("mypower/phase2/energy2", String(e2).c_str());
 delay(10); 
 client.publish("mypower/phase3/energy3", String(e3).c_str());
-delay(10); 
+delay(10);
+client.publish("mypower/energySum", String(eSum).c_str());
+delay(10);	
 client.publish("mypower/z_millis", String(ttime/1000).c_str());
 delay(10); 
 }
