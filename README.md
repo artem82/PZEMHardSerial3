@@ -3,4 +3,7 @@
 Arduino Mega 2560 имеет UART порты в количестве 4 штук.
 3 pzem004t -> mega2560 -> MQTT
 
-Версия 1.0
+Версия 1.1
+
+https://github.com/olehs/PZEM004T
+
